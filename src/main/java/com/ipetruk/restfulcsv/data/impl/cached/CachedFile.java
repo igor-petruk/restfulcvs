@@ -1,5 +1,9 @@
 package com.ipetruk.restfulcsv.data.impl.cached;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.ipetruk.restfulcsv.data.DataAccessException;
 import com.ipetruk.restfulcsv.data.ItemIndexOutOfBoundsException;
 import com.ipetruk.restfulcsv.data.impl.AccessMode;
 import com.ipetruk.restfulcsv.data.impl.CSVFile;
@@ -10,13 +14,24 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.concurrent.ExecutionException;
 
 public class CachedFile implements CSVFile{
-    FileChannel channel;
+    final private LoadingCache<CacheKey, String> cachedLines = CacheBuilder.newBuilder()
+            .build(new CacheLoader<CacheKey, String>() {
+                @Override
+                public String load(CacheKey key) throws Exception {
+                    return performRead(key.getFrom(), key.getSize());
+                }
+            });
+
+    final private FileChannel channel;
+    final private AccessMode mode;
 
     public CachedFile(File filename, AccessMode mode) throws IOException{
         RandomAccessFile file = new RandomAccessFile(filename, mode.getFileOpenMode());
         channel = file.getChannel();
+        this.mode = mode;
     }
 
     @Override
@@ -34,6 +49,18 @@ public class CachedFile implements CSVFile{
     }
 
     public String read(long from, int count) throws IOException{
+        if (AccessMode.READ.equals(mode)){
+            try {
+                return cachedLines.get(new CacheKey(from, count));
+            } catch (ExecutionException e) {
+                throw new ItemIndexOutOfBoundsException("Unable to retrieve object from cache");
+            }
+        }else{
+            return performRead(from, count);
+        }
+    }
+
+    public String performRead(long from, int count) throws IOException{
         ByteBuffer buffer = ByteBuffer.allocate(count);
         long position = from;
         int read;
