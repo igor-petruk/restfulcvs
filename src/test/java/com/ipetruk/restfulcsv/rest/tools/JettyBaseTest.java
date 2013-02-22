@@ -5,6 +5,7 @@ import com.ipetruk.restfulcsv.boilerplate.CoreGuiceConfig;
 import com.ipetruk.restfulcsv.boilerplate.MainGuiceFilter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import org.eclipse.jetty.server.Connector;
 
 import org.eclipse.jetty.server.Server;
@@ -34,6 +35,8 @@ public abstract class JettyBaseTest {
     @Before
     public void startJetty()throws Exception{
         prepareFiles();
+
+        client.addFilter(new LoggingFilter(System.out));
 
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
