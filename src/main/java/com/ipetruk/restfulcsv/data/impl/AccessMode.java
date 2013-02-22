@@ -1,4 +1,4 @@
-package com.ipetruk.restfulcsv.data.impl.mapped;
+package com.ipetruk.restfulcsv.data.impl;
 
 import java.nio.channels.FileChannel;
 import static java.nio.channels.FileChannel.MapMode.*;

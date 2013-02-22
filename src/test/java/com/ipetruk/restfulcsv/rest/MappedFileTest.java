@@ -1,7 +1,7 @@
 package com.ipetruk.restfulcsv.rest;
 
 import com.google.common.base.Strings;
-import com.ipetruk.restfulcsv.data.impl.mapped.AccessMode;
+import com.ipetruk.restfulcsv.data.impl.AccessMode;
 import com.ipetruk.restfulcsv.data.impl.mapped.MappedFile;
 import org.junit.After;
 import org.junit.Before;

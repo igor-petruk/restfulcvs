@@ -1,13 +1,13 @@
-package com.ipetruk.restfulcsv.data.impl.mapped;
+package com.ipetruk.restfulcsv.data.impl;
 
 import com.ipetruk.restfulcsv.data.ItemLock;
 
 import java.nio.channels.FileLock;
 
-public class MappedFileAreaLock implements ItemLock {
+public class FileItemLock implements ItemLock {
     private FileLock fileLock;
 
-    MappedFileAreaLock(FileLock fileLock) {
+    FileItemLock(FileLock fileLock) {
         this.fileLock = fileLock;
     }
 

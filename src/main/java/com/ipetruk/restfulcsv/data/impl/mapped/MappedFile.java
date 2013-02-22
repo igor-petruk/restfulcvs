@@ -1,12 +1,15 @@
 package com.ipetruk.restfulcsv.data.impl.mapped;
 
+import com.ipetruk.restfulcsv.data.impl.AccessMode;
+import com.ipetruk.restfulcsv.data.impl.CSVFile;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
-public class MappedFile implements AutoCloseable{
+public class MappedFile implements CSVFile{
     FileChannel channel;
     MappedByteBuffer mappedByteBuffer;
     AccessMode mode;

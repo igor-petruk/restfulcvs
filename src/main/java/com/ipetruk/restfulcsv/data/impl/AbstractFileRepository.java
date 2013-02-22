@@ -1,4 +1,4 @@
-package com.ipetruk.restfulcsv.data.impl.mapped;
+package com.ipetruk.restfulcsv.data.impl;
 
 import com.google.common.collect.ImmutableMap;
 import com.ipetruk.restfulcsv.boilerplate.ShutdownService;
@@ -6,31 +6,30 @@ import com.ipetruk.restfulcsv.data.*;
 import com.ipetruk.restfulcsv.string.CSVStringService;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.*;
 import java.util.Map;
 
-@Singleton
-public class MappedCSVFileRepository implements DataRepository, Closeable {
+public abstract class AbstractFileRepository implements DataRepository, Closeable {
+
+    public abstract CSVFile buildCSVFile(File file, AccessMode accessMode) throws IOException;
 
     private final int lineLength;
     private final CSVStringService stringService;
-    private final Map<FileType, MappedFile> files;
+    private final Map<FileType, ? extends CSVFile> files;
 
     @Inject
-    public MappedCSVFileRepository(ShutdownService shutdownService,
-                                   CSVStringService stringService,
-                                   @Named("csv.fixed.size") int lineLength,
-                                   @Named("file.initial") String initialFileName,
-                                   @Named("file.active") String activeFileName)
+    public AbstractFileRepository(ShutdownService shutdownService,
+                                  CSVStringService stringService,
+                                  int lineLength,
+                                  String initialFileName,
+                                  String activeFileName)
                             throws IOException{
         shutdownService.registerCloseable(this);
         this.lineLength = lineLength;
         this.stringService = stringService;
 
-        MappedFile initialFile = new MappedFile(new File(initialFileName), AccessMode.READ);
-        MappedFile activeFile = new MappedFile(new File(activeFileName), AccessMode.READ_AND_WRITE);
+        CSVFile initialFile = buildCSVFile(new File(initialFileName), AccessMode.READ);
+        CSVFile activeFile = buildCSVFile(new File(activeFileName), AccessMode.READ_AND_WRITE);
 
         files = ImmutableMap.of(FileType.ACTIVE, activeFile,
                                 FileType.INITIAL, initialFile);
@@ -39,7 +38,7 @@ public class MappedCSVFileRepository implements DataRepository, Closeable {
     @Override
     public void close() throws IOException {
         try{
-            for(MappedFile file: files.values()){
+            for(CSVFile file: files.values()){
                 file.close();
             }
         }catch (Exception e){
@@ -49,7 +48,7 @@ public class MappedCSVFileRepository implements DataRepository, Closeable {
 
     public double readValue(FileType fileType, int index) {
         try{
-            MappedFile file = files.get(fileType);
+            CSVFile file = files.get(fileType);
             return stringService.parseLine(file.read(index*lineLength, lineLength));
         }catch (IOException e){
             throw new DataAccessException("Unable to read item "+index+" to file "+fileType, e);
@@ -60,7 +59,7 @@ public class MappedCSVFileRepository implements DataRepository, Closeable {
 
     public void writeValue(FileType fileType, int index, double value) {
         try{
-            MappedFile file = files.get(fileType);
+            CSVFile file = files.get(fileType);
             file.write(index*lineLength, stringService.produceLine(value));
         }catch (IOException e){
             throw new DataAccessException("Unable to write item "+index+" to file "+fileType, e);
@@ -72,8 +71,8 @@ public class MappedCSVFileRepository implements DataRepository, Closeable {
     @Override
     public ItemLock lock(FileType fileType, int index, boolean shared) {
         try{
-            MappedFile file = files.get(fileType);
-            return new MappedFileAreaLock(file.lock(index*lineLength, lineLength, shared));
+            CSVFile file = files.get(fileType);
+            return new FileItemLock(file.lock(index*lineLength, lineLength, shared));
         }catch(IllegalArgumentException e){
             throw new ItemIndexOutOfBoundsException("Item index is negative:"+index+" when locking to file "+fileType);
         }catch (IOException e){
