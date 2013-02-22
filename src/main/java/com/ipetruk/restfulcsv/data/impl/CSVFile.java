@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.channels.FileLock;
 
 public interface CSVFile extends AutoCloseable{
-    public FileLock lock(int from, int size, boolean shared) throws IOException;
-    public void write(int from, String line) throws IOException;
-    public String read(int from, int count) throws IOException;
+    public FileLock lock(long from, int size, boolean shared) throws IOException;
+    public void write(long from, String line) throws IOException;
+    public String read(long from, int count) throws IOException;
 }

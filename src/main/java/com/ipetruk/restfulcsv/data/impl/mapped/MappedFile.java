@@ -1,5 +1,6 @@
 package com.ipetruk.restfulcsv.data.impl.mapped;
 
+import com.google.common.primitives.Ints;
 import com.ipetruk.restfulcsv.data.impl.AccessMode;
 import com.ipetruk.restfulcsv.data.impl.CSVFile;
 
@@ -28,20 +29,20 @@ public class MappedFile implements CSVFile{
         channel.close();
     }
 
-    public FileLock lock(int from, int size, boolean shared) throws IOException{
+    public FileLock lock(long from, int size, boolean shared) throws IOException{
         return channel.lock(from, size, shared);
     }
 
-    public void write(int from, String line) throws IOException{
+    public void write(long from, String line) throws IOException{
         byte[] lineBytes = line.getBytes("utf-8");
         ByteBuffer copy =  mappedByteBuffer.duplicate();
-        copy.position(from);
+        copy.position(Ints.checkedCast(from));
         copy.put(lineBytes);
     }
 
-    public String read(int from, int count) throws IOException{
+    public String read(long from, int count) throws IOException{
         ByteBuffer copy =  mappedByteBuffer.duplicate();
-        copy.position(from);
+        copy.position(Ints.checkedCast(from));
         byte[] bytes = new byte[count];
         copy.get(bytes);
         return new String(bytes, "utf-8");

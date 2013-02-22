@@ -1,8 +1,8 @@
 package com.ipetruk.restfulcsv.data;
 
 public interface DataRepository {
-    public double readValue(FileType fileType, int index);
-    public void writeValue(FileType fileType, int index, double value);
+    public double readValue(FileType fileType, long index);
+    public void writeValue(FileType fileType, long index, double value);
 
-    public ItemLock lock(FileType fileType, int index, boolean shared);
+    public ItemLock lock(FileType fileType, long index, boolean shared);
 }

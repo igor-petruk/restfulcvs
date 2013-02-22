@@ -46,7 +46,7 @@ public abstract class AbstractFileRepository implements DataRepository, Closeabl
         }
     }
 
-    public double readValue(FileType fileType, int index) {
+    public double readValue(FileType fileType, long index) {
         try{
             CSVFile file = files.get(fileType);
             return stringService.parseLine(file.read(index*lineLength, lineLength));
@@ -57,7 +57,7 @@ public abstract class AbstractFileRepository implements DataRepository, Closeabl
         }
     }
 
-    public void writeValue(FileType fileType, int index, double value) {
+    public void writeValue(FileType fileType, long index, double value) {
         try{
             CSVFile file = files.get(fileType);
             file.write(index*lineLength, stringService.produceLine(value));
@@ -69,7 +69,7 @@ public abstract class AbstractFileRepository implements DataRepository, Closeabl
     }
 
     @Override
-    public ItemLock lock(FileType fileType, int index, boolean shared) {
+    public ItemLock lock(FileType fileType, long index, boolean shared) {
         try{
             CSVFile file = files.get(fileType);
             return new FileItemLock(file.lock(index*lineLength, lineLength, shared));
