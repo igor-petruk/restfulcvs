@@ -24,6 +24,7 @@ public abstract class AbstractFileRepository implements DataRepository, Closeabl
                                   String initialFileName,
                                   String activeFileName)
                             throws IOException{
+        System.out.println(getClass());
         shutdownService.registerCloseable(this);
         this.lineLength = lineLength;
         this.stringService = stringService;
