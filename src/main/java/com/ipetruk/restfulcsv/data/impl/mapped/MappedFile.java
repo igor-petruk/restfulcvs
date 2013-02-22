@@ -1,4 +1,4 @@
-package com.ipetruk.restfulcsv.data.mapped;
+package com.ipetruk.restfulcsv.data.impl.mapped;
 
 import java.io.*;
 import java.nio.ByteBuffer;

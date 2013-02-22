@@ -1,4 +1,4 @@
-package com.ipetruk.restfulcsv.data.mapped;
+package com.ipetruk.restfulcsv.data.impl.mapped;
 
 import com.ipetruk.restfulcsv.data.ItemLock;
 

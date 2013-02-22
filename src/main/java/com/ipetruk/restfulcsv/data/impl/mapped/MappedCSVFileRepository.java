@@ -1,4 +1,4 @@
-package com.ipetruk.restfulcsv.data.mapped;
+package com.ipetruk.restfulcsv.data.impl.mapped;
 
 import com.google.common.collect.ImmutableMap;
 import com.ipetruk.restfulcsv.boilerplate.ShutdownService;
